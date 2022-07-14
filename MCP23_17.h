@@ -25,18 +25,19 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "I2C_Master/MyI2C.h"
-//============================================================================================
-#ifndef MCP23017_ADDRESS
-#define MCP23017_ADDRESS		(uint8_t)0x40
-#endif
+#include "I2C/MyI2C.h"
+
+enum MCP23017_ADDRESS {
+	MCP23017_ADDR = 0x40
+};
+
 //	registers map	============================================================================
 #define MCP23017_IODIRA 	(uint8_t)0x00
 #define MCP23017_IODIRB 	(uint8_t)0x01
 #define MCP23017_IPOLA 		(uint8_t)0x02
 #define MCP23017_IPOLB 		(uint8_t)0x03
-#define MCP23017_GPINTENA (uint8_t)0x04
-#define MCP23017_GPINTENB (uint8_t)0x05
+#define MCP23017_GPINTENA 	(uint8_t)0x04
+#define MCP23017_GPINTENB 	(uint8_t)0x05
 #define MCP23017_DEFVALA 	(uint8_t)0x06
 #define MCP23017_DEFVALB 	(uint8_t)0x07
 #define MCP23017_INTCONA 	(uint8_t)0x08
@@ -77,15 +78,15 @@ extern "C" {
 #define MCP23017_IPOL_IO7_INVERTED	(uint8_t)0x80
 // Pull-Up Resistor Default state: MCP23017_GPPU_ALL_DISABLED	=========================================
 #define MCP23017_GPPU_ALL_DISABLED	(uint8_t)0x00
-#define MCP23017_GPPU_ALL_ENABLED		(uint8_t)0xFF
-#define MCP23017_GPPU_IO0_ENABLED		(uint8_t)0x01
-#define MCP23017_GPPU_IO1_ENABLED		(uint8_t)0x02
-#define MCP23017_GPPU_IO2_ENABLED		(uint8_t)0x04
-#define MCP23017_GPPU_IO3_ENABLED		(uint8_t)0x08
-#define MCP23017_GPPU_IO4_ENABLED		(uint8_t)0x10
-#define MCP23017_GPPU_IO5_ENABLED		(uint8_t)0x20
-#define MCP23017_GPPU_IO6_ENABLED		(uint8_t)0x40
-#define MCP23017_GPPU_IO7_ENABLED		(uint8_t)0x80
+#define MCP23017_GPPU_ALL_ENABLED	(uint8_t)0xFF
+#define MCP23017_GPPU_IO0_ENABLED	(uint8_t)0x01
+#define MCP23017_GPPU_IO1_ENABLED	(uint8_t)0x02
+#define MCP23017_GPPU_IO2_ENABLED	(uint8_t)0x04
+#define MCP23017_GPPU_IO3_ENABLED	(uint8_t)0x08
+#define MCP23017_GPPU_IO4_ENABLED	(uint8_t)0x10
+#define MCP23017_GPPU_IO5_ENABLED	(uint8_t)0x20
+#define MCP23017_GPPU_IO6_ENABLED	(uint8_t)0x40
+#define MCP23017_GPPU_IO7_ENABLED	(uint8_t)0x80
 //	Bit definition pins for PORT A	================================================
 #define MCP23017_GPA0		(uint8_t)0x01
 #define MCP23017_GPA1		(uint8_t)0x02
@@ -108,38 +109,23 @@ extern "C" {
 #define MCP23017_CFG_LENGHT		(uint8_t)22
 #define MCP23017_PORT_LENGHT	(uint8_t)1
 //=======================================================================
-typedef struct MCP23_port_type_t {
+typedef struct MCP23_port {
 		uint8_t portA;
 		uint8_t portB;
-} MCP23_port_type;
+} MCP23_port_t;
 
-/* состояние процесса обмена данными с устройством как с отдельным элементом сети
- * 	применяется для отображения состояния процесса работы с устройством для главного кода
- */
-typedef enum MCP_status_t {//состояние устройства
-	MCP_Init,		//устройство не настроено
-	MCP_OK,		//устройство готово к опросу
-	MCP_Faulth	//устройство неисправно
-} MCP_status;
-
-/*	состояние обмена данными с устройством, использовать для завершения функции работы с устройством */
-typedef enum MCP_Connect_Status_t {
-	MCP_Connect_Processing, //выполняется работа с устройством: обмен данными, обработка результатов
-	MCP_Connect_Complite	//работа с устройством завершена, данные считаны/записаны корректно
-} MCP_Connect_Status;
-
-typedef struct MCP23_type_t {
-		uint8_t addr;
+typedef struct MCP23 {
+		const uint8_t addr;
 		uint8_t step;
-		MCP_status status;
-		MCP23_port_type data;
-} MCP23_type;
+		Device_status_t status;
+		MCP23_port_t data;
+} MCP23_t;
 //function	==================================================================
-MCP_Connect_Status MCP23_17_Init(I2C_Connection *_i2c, MCP23_type *dev, uint8_t *pbuffer);
-MCP_Connect_Status MCP23_17_ReadPortA(I2C_Connection *_i2c, MCP23_type *dev, uint8_t *pbuffer);
-MCP_Connect_Status MCP23_17_ReadPortB(I2C_Connection *_i2c, MCP23_type *dev, uint8_t *pbuffer);
-MCP_Connect_Status MCP23_17_WritePortA(I2C_Connection *_i2c, MCP23_type *dev, uint8_t *pbuffer, uint8_t value);
-MCP_Connect_Status MCP23_17_WritePortB(I2C_Connection *_i2c, MCP23_type *dev, uint8_t *pbuffer, uint8_t value);
+uint8_t MCP23_17_Init(I2C_Connection *_i2c, MCP23_t *dev);
+uint8_t MCP23_17_ReadPortA(I2C_Connection *_i2c, MCP23_t *dev);
+uint8_t MCP23_17_ReadPortB(I2C_Connection *_i2c, MCP23_t *dev);
+uint8_t MCP23_17_WritePortA(I2C_Connection *_i2c, MCP23_t *dev, uint8_t value);
+uint8_t MCP23_17_WritePortB(I2C_Connection *_i2c, MCP23_t *dev, uint8_t value);
 
 #ifdef __cplusplus
 }
